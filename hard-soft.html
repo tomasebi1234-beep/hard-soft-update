@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upgradarea Sistemului de Calcul</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #060D1A;
+    --surface:  #0D1E35;
+    --card:     #112240;
+    --border:   #1E3A5F;
+    --cyan:     #00E5FF;
+    --cyan2:    #00B4D8;
+    --blue:     #1565C0;
+    --green:    #00E676;
+    --red:      #FF5252;
+    --yellow:   #FFD740;
+    --text:     #E8F4FD;
+    --muted:    #7BAFD4;
+    --mono:     'Space Mono', monospace;
+    --sans:     'Outfit', sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    overflow-x: hidden;
+  }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--cyan2); border-radius:3px; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top:0; left:0; right:0; z-index:100;
+    background: rgba(6,13,26,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2rem; height: 60px;
+  }
+  .nav-logo {
+    font-family: var(--mono); font-size:0.9rem; color: var(--cyan);
+    letter-spacing: 2px; text-transform: uppercase;
+  }
+  .nav-links { display:flex; gap:0.4rem; }
+  .nav-links a {
+    color: var(--muted); text-decoration:none; font-size:0.8rem;
+    padding:0.4rem 0.8rem; border-radius:4px;
+    transition: all 0.2s; font-family: var(--mono);
+  }
+  .nav-links a:hover { color: var(--cyan); background: rgba(0,229,255,0.08); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:2rem;
+    position:relative; overflow:hidden;
+  }
+  .hero-grid {
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.04) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridMove 20s linear infinite;
+  }
+  @keyframes gridMove {
+    0%   { background-position: 0 0; }
+    100% { background-position: 50px 50px; }
+  }
+  .hero-glow {
+    position:absolute; top:30%; left:50%; transform:translate(-50%,-50%);
+    width:600px; height:600px; border-radius:50%;
+    background: radial-gradient(circle, rgba(0,180,216,0.12) 0%, transparent 70%);
+    pointer-events:none;
+  }
+  .hero-badge {
+    font-family: var(--mono); font-size:0.75rem; color: var(--cyan);
+    border:1px solid var(--cyan); border-radius:20px;
+    padding:0.35rem 1rem; margin-bottom:1.5rem;
+    letter-spacing:2px; opacity:0;
+    animation: fadeUp 0.6s 0.2s ease forwards;
+  }
+  .hero h1 {
+    font-size: clamp(2.5rem, 7vw, 5rem);
+    font-weight:900; line-height:1.05;
+    opacity:0; animation: fadeUp 0.6s 0.4s ease forwards;
+  }
+  .hero h1 span { color: var(--cyan); }
+  .hero-sub {
+    font-size:1.1rem; color: var(--muted); max-width:560px;
+    margin: 1.2rem auto 2.5rem; line-height:1.7;
+    opacity:0; animation: fadeUp 0.6s 0.6s ease forwards;
+  }
+  .hero-btns {
+    display:flex; gap:1rem; flex-wrap:wrap; justify-content:center;
+    opacity:0; animation: fadeUp 0.6s 0.8s ease forwards;
+  }
+  .btn {
+    padding:0.8rem 1.8rem; border-radius:6px; font-size:0.9rem;
+    font-weight:700; cursor:pointer; border:none;
+    text-decoration:none; display:inline-flex; align-items:center; gap:0.5rem;
+    transition: all 0.25s; font-family: var(--sans); letter-spacing:0.5px;
+  }
+  .btn-primary {
+    background: var(--cyan); color: var(--bg);
+  }
+  .btn-primary:hover { background:#fff; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,229,255,0.3); }
+  .btn-outline {
+    background: transparent; color: var(--cyan);
+    border: 1.5px solid var(--cyan);
+  }
+  .btn-outline:hover { background: rgba(0,229,255,0.1); transform: translateY(-2px); }
+
+  .hero-stats {
+    display:flex; gap:3rem; margin-top:4rem; flex-wrap:wrap; justify-content:center;
+    opacity:0; animation: fadeUp 0.6s 1s ease forwards;
+  }
+  .stat { text-align:center; }
+  .stat-num {
+    font-family: var(--mono); font-size:2rem; font-weight:700; color: var(--cyan);
+    display:block;
+  }
+  .stat-label { font-size:0.78rem; color: var(--muted); letter-spacing:1px; text-transform:uppercase; }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(24px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  /* ── SECTIONS ── */
+  section { padding: 5rem 1.5rem; }
+  .container { max-width:1100px; margin:0 auto; }
+  .section-label {
+    font-family: var(--mono); font-size:0.7rem; color: var(--cyan);
+    letter-spacing:3px; text-transform:uppercase; margin-bottom:0.6rem;
+  }
+  .section-title {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight:800; margin-bottom:1rem; line-height:1.2;
+  }
+  .section-desc { color: var(--muted); max-width:600px; line-height:1.7; margin-bottom:3rem; }
+
+  /* ── TABS ── */
+  .tabs {
+    display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:2rem;
+  }
+  .tab {
+    padding:0.55rem 1.2rem; border-radius:6px; cursor:pointer;
+    border: 1.5px solid var(--border); background: var(--surface);
+    color: var(--muted); font-size:0.85rem; font-weight:600;
+    transition: all 0.2s; font-family: var(--sans);
+  }
+  .tab.active, .tab:hover {
+    border-color: var(--cyan); color: var(--cyan);
+    background: rgba(0,229,255,0.08);
+  }
+
+  /* ── HW CARDS ── */
+  .hw-grid {
+    display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap:1.2rem;
+  }
+  .hw-card {
+    background: var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:1.5rem; transition: all 0.3s; position:relative; overflow:hidden;
+    cursor:default;
+  }
+  .hw-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background: linear-gradient(90deg, var(--cyan), transparent);
+    opacity:0; transition: opacity 0.3s;
+  }
+  .hw-card:hover { border-color: var(--cyan2); transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,180,216,0.15); }
+  .hw-card:hover::before { opacity:1; }
+  .hw-icon { font-size:2rem; margin-bottom:0.8rem; display:block; }
+  .hw-card h3 { font-size:1rem; font-weight:700; margin-bottom:0.5rem; color: var(--cyan); }
+  .hw-card p { font-size:0.875rem; color: var(--muted); line-height:1.6; margin-bottom:1rem; }
+  .hw-tag {
+    display:inline-block; font-family: var(--mono); font-size:0.68rem;
+    background: rgba(0,229,255,0.1); color: var(--cyan);
+    border:1px solid rgba(0,229,255,0.2); border-radius:4px;
+    padding:0.2rem 0.5rem; margin:0.15rem 0.1rem;
+  }
+  .hw-impact {
+    margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .impact-label { font-size:0.72rem; color: var(--muted); text-transform:uppercase; letter-spacing:1px; }
+  .impact-bar-wrap { flex:1; height:4px; background: var(--border); border-radius:2px; margin:0 0.8rem; }
+  .impact-bar { height:100%; border-radius:2px; background: linear-gradient(90deg, var(--cyan2), var(--cyan)); transition: width 1s ease; }
+  .impact-pct { font-family: var(--mono); font-size:0.75rem; color: var(--cyan); min-width:2.5rem; text-align:right; }
+
+  /* ── STEPS ── */
+  .steps-wrap { position:relative; }
+  .step {
+    display:flex; gap:1.5rem; margin-bottom:1.5rem;
+    background: var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:1.5rem; transition: all 0.3s;
+  }
+  .step:hover { border-color: var(--cyan2); box-shadow: 0 4px 20px rgba(0,180,216,0.1); }
+  .step-num {
+    width:44px; height:44px; min-width:44px; border-radius:50%;
+    background: rgba(0,229,255,0.1); border: 2px solid var(--cyan);
+    display:flex; align-items:center; justify-content:center;
+    font-family: var(--mono); font-size:1rem; font-weight:700; color: var(--cyan);
+  }
+  .step-body h3 { font-size:1rem; font-weight:700; margin-bottom:0.4rem; }
+  .step-body p { font-size:0.875rem; color: var(--muted); line-height:1.6; }
+  .step-tool {
+    margin-top:0.6rem; font-family: var(--mono); font-size:0.7rem;
+    color: var(--yellow); background: rgba(255,215,64,0.08);
+    border:1px solid rgba(255,215,64,0.2); border-radius:4px;
+    padding:0.2rem 0.6rem; display:inline-block;
+  }
+
+  /* ── COMPARISON ── */
+  .compare-grid {
+    display:grid; grid-template-columns:1fr 60px 1fr; gap:1rem; align-items:start;
+  }
+  .compare-col {
+    background: var(--card); border:1px solid var(--border); border-radius:10px;
+    overflow:hidden;
+  }
+  .compare-header {
+    padding:1rem 1.2rem; font-weight:700; font-size:0.9rem;
+    display:flex; align-items:center; gap:0.5rem;
+  }
+  .compare-header.before { background: rgba(255,82,82,0.15); color:#FF8A80; border-bottom:2px solid #FF5252; }
+  .compare-header.after  { background: rgba(0,230,118,0.1);  color:#69F0AE; border-bottom:2px solid #00E676; }
+  .compare-row {
+    padding:0.75rem 1.2rem; border-bottom:1px solid var(--border);
+    font-size:0.85rem; line-height:1.5;
+  }
+  .compare-row:last-child { border-bottom:none; }
+  .compare-row.before { color:#FF8A80; }
+  .compare-row.after  { color:#69F0AE; }
+  .vs-badge {
+    width:60px; height:60px; border-radius:50%;
+    background: var(--cyan); color: var(--bg);
+    display:flex; align-items:center; justify-content:center;
+    font-weight:900; font-size:1rem; align-self:center;
+    box-shadow: 0 0 30px rgba(0,229,255,0.4);
+    font-family: var(--mono);
+  }
+  @media(max-width:620px){
+    .compare-grid { grid-template-columns:1fr; }
+    .vs-badge { display:none; }
+  }
+
+  /* ── SIMULATOR ── */
+  .sim-wrap {
+    background: var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:2rem;
+  }
+  .sim-title { font-size:1rem; font-weight:700; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.5rem; }
+  .sim-title span { color: var(--cyan); }
+  .sim-grid { display:grid; grid-template-columns:1fr 1fr; gap:2rem; }
+  @media(max-width:680px){ .sim-grid { grid-template-columns:1fr; } }
+  .sim-section h4 {
+    font-size:0.78rem; text-transform:uppercase; letter-spacing:2px;
+    color: var(--muted); margin-bottom:1rem; font-family: var(--mono);
+  }
+  .sim-item {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0.7rem 0; border-bottom:1px solid var(--border);
+    gap:1rem;
+  }
+  .sim-item:last-child { border-bottom:none; }
+  .sim-item-name { font-size:0.85rem; font-weight:600; }
+  .sim-item-sub  { font-size:0.72rem; color: var(--muted); }
+  .sim-toggle {
+    position:relative; width:44px; height:24px; cursor:pointer; flex-shrink:0;
+  }
+  .sim-toggle input { opacity:0; width:0; height:0; }
+  .sim-slider {
+    position:absolute; inset:0; background: var(--border); border-radius:12px;
+    transition: 0.3s;
+  }
+  .sim-slider::before {
+    content:''; position:absolute; left:3px; top:3px;
+    width:18px; height:18px; border-radius:50%;
+    background: var(--muted); transition: 0.3s;
+  }
+  .sim-toggle input:checked + .sim-slider { background: rgba(0,229,255,0.3); }
+  .sim-toggle input:checked + .sim-slider::before {
+    background: var(--cyan); transform: translateX(20px);
+  }
+  .sim-results {
+    margin-top:1.5rem; padding:1.5rem;
+    background: var(--surface); border-radius:8px; border:1px solid var(--border);
+  }
+  .sim-results h4 {
+    font-size:0.78rem; text-transform:uppercase; letter-spacing:2px;
+    color: var(--muted); margin-bottom:1rem; font-family: var(--mono);
+  }
+  .sim-metrics { display:grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap:1rem; }
+  .sim-metric {
+    background: var(--card); border:1px solid var(--border); border-radius:8px;
+    padding:0.8rem; text-align:center;
+  }
+  .sim-metric .val {
+    font-family: var(--mono); font-size:1.4rem; font-weight:700; color: var(--cyan);
+    display:block; margin-bottom:0.2rem;
+  }
+  .sim-metric .lbl { font-size:0.7rem; color: var(--muted); text-transform:uppercase; letter-spacing:1px; }
+  .sim-metric .delta {
+    font-size:0.72rem; font-family: var(--mono); margin-top:0.2rem; display:block;
+  }
+  .sim-metric .delta.up   { color: var(--green); }
+  .sim-metric .delta.down { color: var(--red); }
+  .sim-cost-bar {
+    margin-top:1rem; padding:1rem;
+    background: var(--card); border-radius:8px; border:1px solid var(--border);
+  }
+  .cost-row { display:flex; justify-content:space-between; padding:0.4rem 0; font-size:0.85rem; }
+  .cost-row .name { color: var(--muted); }
+  .cost-row .price { font-family: var(--mono); color: var(--cyan); }
+  .cost-total {
+    display:flex; justify-content:space-between;
+    padding:0.6rem 0; margin-top:0.5rem;
+    border-top:1px solid var(--cyan); font-weight:700;
+  }
+  .cost-total .name { color: var(--text); }
+  .cost-total .price { font-family: var(--mono); font-size:1.1rem; color: var(--cyan); }
+
+  /* ── QUIZ ── */
+  .quiz-wrap {
+    background: var(--card); border:1px solid var(--border); border-radius:12px;
+    padding:2rem; max-width:680px; margin:0 auto;
+  }
+  .quiz-progress {
+    display:flex; gap:4px; margin-bottom:2rem;
+  }
+  .quiz-progress-seg {
+    flex:1; height:3px; border-radius:2px; background: var(--border);
+    transition: background 0.4s;
+  }
+  .quiz-progress-seg.done { background: var(--cyan); }
+  .quiz-q { font-size:1rem; font-weight:700; margin-bottom:1.5rem; line-height:1.5; }
+  .quiz-options { display:flex; flex-direction:column; gap:0.7rem; }
+  .quiz-opt {
+    padding:0.85rem 1.2rem; border-radius:8px;
+    border: 1.5px solid var(--border); background: var(--surface);
+    cursor:pointer; font-size:0.9rem; text-align:left;
+    transition: all 0.2s; color: var(--text);
+    font-family: var(--sans);
+  }
+  .quiz-opt:hover  { border-color: var(--cyan2); background: rgba(0,180,216,0.08); }
+  .quiz-opt.correct { border-color: var(--green); background: rgba(0,230,118,0.1); color:#69F0AE; }
+  .quiz-opt.wrong   { border-color: var(--red);   background: rgba(255,82,82,0.1);  color:#FF8A80; }
+  .quiz-feedback { margin-top:1rem; font-size:0.88rem; line-height:1.6; min-height:1.5rem; }
+  .quiz-feedback.ok  { color: var(--green); }
+  .quiz-feedback.err { color: var(--red); }
+  .quiz-nav { display:flex; justify-content:space-between; align-items:center; margin-top:1.5rem; }
+  .quiz-counter { font-family: var(--mono); font-size:0.78rem; color: var(--muted); }
+  .quiz-result { text-align:center; padding:1rem 0; }
+  .quiz-result .score {
+    font-family: var(--mono); font-size:3.5rem; font-weight:700; color: var(--cyan);
+    display:block; margin-bottom:0.5rem;
+  }
+  .quiz-result p { color: var(--muted); font-size:0.95rem; margin-bottom:1.5rem; }
+
+  /* ── COST TABLE ── */
+  .cost-table { width:100%; border-collapse:collapse; }
+  .cost-table th {
+    padding:0.8rem 1rem; font-size:0.75rem; text-transform:uppercase;
+    letter-spacing:1px; font-family: var(--mono); color: var(--muted);
+    border-bottom:2px solid var(--border); text-align:left;
+  }
+  .cost-table td {
+    padding:0.75rem 1rem; font-size:0.87rem; border-bottom:1px solid var(--border);
+  }
+  .cost-table tr:hover td { background: rgba(0,229,255,0.04); }
+  .cost-table tr.total td { color: var(--cyan); font-weight:700; border-top:2px solid var(--cyan); border-bottom:none; font-family: var(--mono); }
+  .cost-table .badge {
+    display:inline-block; font-size:0.65rem; font-family: var(--mono);
+    padding:0.2rem 0.5rem; border-radius:3px;
+  }
+  .badge-low  { background: rgba(0,230,118,0.12); color: var(--green); }
+  .badge-mid  { background: rgba(255,215,64,0.12); color: var(--yellow); }
+  .badge-high { background: rgba(255,82,82,0.12);  color: var(--red); }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align:center; padding:2.5rem 1rem;
+    border-top:1px solid var(--border);
+    font-size:0.8rem; color: var(--muted); font-family: var(--mono);
+  }
+  footer a { color: var(--cyan); text-decoration:none; }
+
+  /* ── MISC ── */
+  .divider { height:1px; background: var(--border); margin:1rem 0; }
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:2rem; }
+  @media(max-width:700px){ .two-col { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-logo">// SYS.UPGRADE</div>
+  <div class="nav-links">
+    <a href="#componente">Hardware</a>
+    <a href="#software">Software</a>
+    <a href="#etape">Etape</a>
+    <a href="#simulator">Simulator</a>
+    <a href="#quiz">Quiz</a>
+    <a href="#costuri">Costuri</a>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div style="position:relative; z-index:1;">
+    <div class="hero-badge">▸ Proiect Academic 2025-2026</div>
+    <h1>Upgradarea unui<br><span>Sistem de Calcul</span></h1>
+    <p class="hero-sub">Explorează hardware, software, etapele procesului și simulează costurile unui upgrade real — interactiv.</p>
+    <div class="hero-btns">
+      <a href="#componente" class="btn btn-primary">▸ Explorează</a>
+      <a href="#quiz" class="btn btn-outline">Testează-te →</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">6</span><span class="stat-label">Componente HW</span></div>
+      <div class="stat"><span class="stat-num">5</span><span class="stat-label">Categorii SW</span></div>
+      <div class="stat"><span class="stat-num">6</span><span class="stat-label">Etape proces</span></div>
+      <div class="stat"><span class="stat-num">10</span><span class="stat-label">Întrebări quiz</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── HARDWARE ── -->
+<section id="componente">
+<div class="container">
+  <div class="section-label">// 01 — Hardware</div>
+  <h2 class="section-title">Componente Hardware</h2>
+  <p class="section-desc">Cele mai importante componente fizice care pot fi înlocuite sau adăugate pentru a crește performanța unui sistem de calcul.</p>
+
+  <div class="hw-grid" id="hwGrid"></div>
+</div>
+</section>
+
+<!-- ── SOFTWARE ── -->
+<section id="software" style="background: var(--surface);">
+<div class="container">
+  <div class="section-label">// 02 — Software</div>
+  <h2 class="section-title">Upgrade Software</h2>
+  <p class="section-desc">Actualizarea componentelor software este la fel de importantă ca cea hardware — asigură securitate, compatibilitate și performanță.</p>
+
+  <div class="tabs" id="swTabs"></div>
+  <div id="swContent"></div>
+</div>
+</section>
+
+<!-- ── ETAPE ── -->
+<section id="etape">
+<div class="container">
+  <div class="section-label">// 03 — Proces</div>
+  <h2 class="section-title">Etapele Upgradării</h2>
+  <p class="section-desc">Un upgrade reușit urmează un proces structurat. Sari peste orice etapă și riști pierderea datelor sau incompatibilități costisitoare.</p>
+
+  <div class="two-col">
+    <div id="stepsWrap"></div>
+    <div>
+      <div class="sim-wrap">
+        <div class="sim-title">📊 Comparație <span>Înainte vs După</span></div>
+        <div class="compare-grid">
+          <div class="compare-col">
+            <div class="compare-header before">❌ Înainte</div>
+            <div class="compare-row before">HDD 500GB • ~120 MB/s</div>
+            <div class="compare-row before">4GB RAM DDR3</div>
+            <div class="compare-row before">Dual-core 2013</div>
+            <div class="compare-row before">Windows 7 (nesusținut)</div>
+            <div class="compare-row before">Boot: 90+ secunde</div>
+            <div class="compare-row before">Drivere vechi</div>
+            <div class="compare-row before">Fără securitate activă</div>
+          </div>
+          <div class="vs-badge">VS</div>
+          <div class="compare-col">
+            <div class="compare-header after">✅ După</div>
+            <div class="compare-row after">SSD NVMe 1TB • 3500 MB/s</div>
+            <div class="compare-row after">16GB RAM DDR4</div>
+            <div class="compare-row after">Hexa-core 2024</div>
+            <div class="compare-row after">Windows 11 (suport activ)</div>
+            <div class="compare-row after">Boot: 8 secunde</div>
+            <div class="compare-row after">Drivere actualizate</div>
+            <div class="compare-row after">Securitate maximă</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ── SIMULATOR ── -->
+<section id="simulator" style="background: var(--surface);">
+<div class="container">
+  <div class="section-label">// 04 — Simulator</div>
+  <h2 class="section-title">Simulator de Upgrade</h2>
+  <p class="section-desc">Activează componentele dorite și calculatorul estimează automat performanța și costul total al upgrade-ului tău.</p>
+
+  <div class="sim-wrap">
+    <div class="sim-grid">
+      <div>
+        <div class="sim-section">
+          <h4>🔧 Hardware</h4>
+          <div id="simHW"></div>
+        </div>
+      </div>
+      <div>
+        <div class="sim-section">
+          <h4>💻 Software</h4>
+          <div id="simSW"></div>
+        </div>
+      </div>
+    </div>
+    <div class="sim-results">
+      <h4>📈 Rezultate estimate</h4>
+      <div class="sim-metrics" id="simMetrics"></div>
+      <div class="sim-cost-bar" id="simCostBar"></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ── QUIZ ── -->
+<section id="quiz">
+<div class="container">
+  <div class="section-label">// 05 — Quiz</div>
+  <h2 class="section-title">Testează-ți Cunoștințele</h2>
+  <p class="section-desc">10 întrebări despre upgradarea sistemelor de calcul. Câte știi?</p>
+
+  <div class="quiz-wrap">
+    <div class="quiz-progress" id="quizProgress"></div>
+    <div id="quizBody"></div>
+  </div>
+</div>
+</section>
+
+<!-- ── COSTURI ── -->
+<section id="costuri" style="background: var(--surface);">
+<div class="container">
+  <div class="section-label">// 06 — Costuri</div>
+  <h2 class="section-title">Costuri Orientative</h2>
+  <p class="section-desc">Prețuri estimative pentru componentele cele mai frecvent upgradatate (piața românească, 2025).</p>
+
+  <div style="overflow-x:auto;">
+  <table class="cost-table">
+    <thead>
+      <tr>
+        <th>Componentă</th>
+        <th>Bugetar</th>
+        <th>Mid-range</th>
+        <th>High-end</th>
+        <th>Impact performanță</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>SSD NVMe 1TB</td><td>~200 RON</td><td>~350 RON</td><td>~700 RON</td><td><span class="badge badge-high">⬆⬆⬆ Maxim</span></td></tr>
+      <tr><td>RAM 16GB DDR4</td><td>~250 RON</td><td>~400 RON</td><td>~600 RON</td><td><span class="badge badge-high">⬆⬆⬆ Maxim</span></td></tr>
+      <tr><td>Procesor (CPU)</td><td>~400 RON</td><td>~900 RON</td><td>~2.000+ RON</td><td><span class="badge badge-mid">⬆⬆ Ridicat</span></td></tr>
+      <tr><td>Placă video (GPU)</td><td>~600 RON</td><td>~1.500 RON</td><td>~4.000+ RON</td><td><span class="badge badge-mid">⬆⬆ Ridicat</span></td></tr>
+      <tr><td>Placă de bază</td><td>~350 RON</td><td>~700 RON</td><td>~1.500+ RON</td><td><span class="badge badge-low">⬆ Mediu</span></td></tr>
+      <tr><td>Sursă alimentare</td><td>~200 RON</td><td>~400 RON</td><td>~800 RON</td><td><span class="badge badge-low">⬆ Stabilitate</span></td></tr>
+      <tr><td>Licență Windows 11</td><td colspan="3" style="color:var(--cyan);font-family:var(--mono);">~400 RON (fixă)</td><td><span class="badge badge-mid">⬆⬆ Securitate</span></td></tr>
+      <tr class="total"><td>TOTAL ESTIMAT</td><td>~2.000 RON</td><td>~4.250 RON</td><td>~10.000 RON</td><td>—</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div style="margin-top:1.5rem; padding:1.2rem 1.5rem; background:var(--card); border:1px solid var(--border); border-radius:8px; border-left:3px solid var(--cyan);">
+    <p style="font-size:0.9rem; color:var(--muted); line-height:1.7;">
+      💡 <strong style="color:var(--cyan);">Concluzie economică:</strong>
+      Un PC nou de performanță medie costă <strong style="color:var(--text);">3.000–6.000 RON</strong>.
+      Upgradarea selectivă a unui sistem existent poate oferi performanțe similare la
+      <strong style="color:var(--green);">50–70% din cost</strong>, cu recuperarea investiției în 12–18 luni.
+    </p>
+  </div>
+</div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <p>// <span style="color:var(--cyan);">Upgradarea unui Sistem de Calcul</span> — Proiect Academic 2025-2026</p>
+  <p style="margin-top:0.5rem;">Built with ♥ · Hardware & Software</p>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════
+
+const hwData = [
+  {
+    icon:'🧠', name:'Procesor (CPU)',
+    desc:'Creierul sistemului. Un CPU mai nou aduce mai multe nuclee, frecvențe mai mari și eficiență energetică superioară.',
+    tags:['Intel Core i7/i9','AMD Ryzen 7000','DDR5','PCIe 5.0'],
+    impact: 82
+  },
+  {
+    icon:'💾', name:'Memorie RAM',
+    desc:'Creșterea RAM reduce swap-ul pe disc și permite rularea simultană a mai multor aplicații fără încetiniri.',
+    tags:['DDR4 16GB','DDR5 32GB','Dual-channel','XMP/EXPO'],
+    impact: 78
+  },
+  {
+    icon:'💿', name:'Stocare SSD NVMe',
+    desc:'Cel mai impactant upgrade: viteze de 30x față de HDD. Bootul scade de la 90s la sub 10 secunde.',
+    tags:['PCIe Gen 4','3500 MB/s','M.2 2280','1TB / 2TB'],
+    impact: 95
+  },
+  {
+    icon:'🎮', name:'Placă video (GPU)',
+    desc:'Esențial pentru gaming, editare video și AI. Suportă ray-tracing, DLSS 3 și redare 4K.',
+    tags:['RTX 4070','RX 7800 XT','DLSS 3','Ray Tracing'],
+    impact: 88
+  },
+  {
+    icon:'🔌', name:'Placă de bază',
+    desc:'Permite suport pentru procesoare noi, memorii DDR5, PCIe 5.0, Wi-Fi 6E și USB 3.2 Gen 2.',
+    tags:['Socket AM5','LGA1700','ATX / mATX','Wi-Fi 6E'],
+    impact: 60
+  },
+  {
+    icon:'⚡', name:'Sursă alimentare',
+    desc:'O sursă 80+ Gold/Platinum asigură stabilitate, protecție la supratensiuni și eficiență energetică.',
+    tags:['80+ Gold','650W / 850W','Modular','Protecție OVP'],
+    impact: 50
+  },
+];
+
+const swData = [
+  {
+    id:'os', label:'Sistem de Operare',
+    icon:'🖥️',
+    title:'Sistem de Operare (SO)',
+    desc:'Trecerea la Windows 11 sau o distribuție Linux modernă aduce îmbunătățiri majore de securitate, performanță și compatibilitate.',
+    details:[
+      'Securitate: BitLocker, Secure Boot, TPM 2.0',
+      'Performanță: DirectStorage, Auto HDR',
+      'Interfață modernă și touch-friendly',
+      'Actualizări automate de securitate',
+      'Suport pentru ultimele generații de hardware',
+    ],
+    tip:'Înainte de upgrade SO, fă întotdeauna un backup complet!'
+  },
+  {
+    id:'drivers', label:'Drivere',
+    icon:'🔧',
+    title:'Drivere de sistem',
+    desc:'Driverele actualizate optimizează comunicarea dintre SO și hardware, corectează bug-uri și adaugă funcționalități noi.',
+    details:[
+      'Driver GPU: optimizări pentru jocuri noi',
+      'Chipset: stabilitate și funcții noi',
+      'Audio: codec actualizat, latență redusă',
+      'Rețea: Wi-Fi 6/6E, Ethernet 2.5G',
+      'USB / Bluetooth: compatibilitate extinsă',
+    ],
+    tip:'Folosește DDU (Display Driver Uninstaller) înainte de a instala drivere GPU noi.'
+  },
+  {
+    id:'security', label:'Securitate',
+    icon:'🛡️',
+    title:'Software de securitate',
+    desc:'Soluțiile de securitate actualizate protejează împotriva ransomware, phishing și exploit-urilor zero-day.',
+    details:[
+      'Antivirus cu protecție în timp real',
+      'Firewall configurat corespunzător',
+      'VPN pentru confidențialitate',
+      'Manager de parole (Bitwarden, KeePass)',
+      'Autentificare în doi pași (2FA)',
+    ],
+    tip:'Windows Defender (inclus gratuit) este suficient pentru uz casnic cu actualizări regulate.'
+  },
+  {
+    id:'apps', label:'Aplicații',
+    icon:'📦',
+    title:'Aplicații și utilitare',
+    desc:'Actualizarea aplicațiilor îmbunătățește funcționalitatea, corectează vulnerabilități și asigură compatibilitatea cu formate noi.',
+    details:[
+      'Suite office: Microsoft 365, LibreOffice',
+      'Browsere: Chrome, Firefox, Edge (Chromium)',
+      'Utilitare: 7-Zip, VLC, PDF readers',
+      'Tools de monitoring: HWMonitor, CPU-Z',
+      'Backup: Macrium Reflect, Veeam',
+    ],
+    tip:'Folosește Winget sau Chocolatey pentru a actualiza toate aplicațiile dintr-o comandă.'
+  },
+  {
+    id:'firmware', label:'Firmware / BIOS',
+    icon:'⚙️',
+    title:'Firmware și BIOS/UEFI',
+    desc:'Actualizarea BIOS-ului aduce suport pentru procesoare noi, corectează vulnerabilități (Spectre/Meltdown) și îmbunătățește stabilitatea.',
+    details:[
+      'Suport pentru noi procesoare (microcode)',
+      'Corecție vulnerabilități CPU (Spectre, Meltdown)',
+      'Îmbunătățiri de stabilitate și compatibilitate RAM',
+      'Funcții noi: PBO, EXPO, BCLK OC',
+      'Firmware SSD: performanță și durabilitate',
+    ],
+    tip:'Actualizează BIOS-ul DOAR dacă ai o nevoie clară — riscul de brick există dacă se întrerupe curentul!'
+  },
+];
+
+const steps = [
+  { num:1, title:'Diagnosticare', desc:'Analizează componentele actuale și identifică gâtuirile de performanță. Documentează specificațiile complete.', tool:'CPU-Z · GPU-Z · CrystalDiskInfo · HWMonitor' },
+  { num:2, title:'Planificare & Compatibilitate', desc:'Alege componentele compatibile cu socket-ul, chipset-ul și forma plăcii de bază existente. Verifică pe PCPartPicker.', tool:'pcpartpicker.com · ark.intel.com · amd.com' },
+  { num:3, title:'Backup date', desc:'Salvează TOATE datele importante pe un disc extern sau în cloud ÎNAINTE de orice intervenție fizică sau software.', tool:'Windows Backup · Acronis · Macrium Reflect' },
+  { num:4, title:'Achiziție', desc:'Cumpără componentele de la furnizori autorizați cu garanție. Verifică recenzii pe Tom\'s Hardware sau Guru3D.', tool:'eMag · PCGarage · Altex · Newegg' },
+  { num:5, title:'Instalare', desc:'Lucrează pe o suprafață anti-statică. Folosește bandă ESD. Pentru SW, creează un USB bootabil și instalează curat.', tool:'Rufus (USB boot) · Bandă ESD · Șurubelniță' },
+  { num:6, title:'Testare & Benchmarking', desc:'Rulează stress-teste de stabilitate și benchmarkuri pentru a confirma că tot funcționează corect și la capacitate maximă.', tool:'Prime95 · FurMark · CrystalDiskMark · Cinebench' },
+];
+
+const simHWItems = [
+  { id:'ssd',  name:'SSD NVMe 1TB',  sub:'PCIe Gen 4 • 3500 MB/s', price:350,  bootDelta:-75, perfDelta:30, scoreDelta:20 },
+  { id:'ram',  name:'RAM 16GB DDR4', sub:'Dual channel • 3200MHz',  price:400,  bootDelta:-5,  perfDelta:25, scoreDelta:15 },
+  { id:'cpu',  name:'Procesor Hexa-core', sub:'AMD Ryzen 5 / Intel i5', price:900, bootDelta:-3, perfDelta:40, scoreDelta:35 },
+  { id:'gpu',  name:'Placă video RTX',  sub:'8GB GDDR6 • Ray Tracing', price:1500, bootDelta:0,  perfDelta:60, scoreDelta:50 },
+];
+const simSWItems = [
+  { id:'win11', name:'Windows 11 Pro', sub:'Licență originală',       price:400, bootDelta:-10, perfDelta:8,  scoreDelta:5 },
+  { id:'drv',   name:'Drivere actualizate', sub:'GPU + Chipset + Audio', price:0, bootDelta:-2,  perfDelta:5,  scoreDelta:3 },
+  { id:'av',    name:'Antivirus Premium', sub:'Protecție în timp real', price:150, bootDelta:2,   perfDelta:-2, scoreDelta:1 },
+];
+
+const quizData = [
+  { q:'Ce înseamnă SSD NVMe?', opts:['Non-Volatile Memory Express','New Virtual Machine Extension','Network Video Memory Executor','None of the above'], ans:0, exp:'NVMe (Non-Volatile Memory Express) este un protocol de comunicare optimizat pentru SSD-uri prin interfața PCIe, oferind viteze mult mai mari decât SATA.' },
+  { q:'Care componentă are cel mai mare impact cost-performanță la upgrade?', opts:['Placa video (GPU)','Procesorul (CPU)','SSD NVMe (înlocuind HDD)','Placa de bază'], ans:2, exp:'Înlocuirea HDD cu SSD NVMe oferă cel mai vizibil upgrade la prețuri accesibile — vitezele cresc de 30x, iar boot-ul scade de la 90s la sub 10s.' },
+  { q:'Ce înseamnă certificarea 80+ Gold pentru o sursă de alimentare?', opts:['Puterea maximă este 80W','Eficiența energetică este de minim 87-90%','Garanția este de minim 80 luni','Componentele sunt 80% aur'] , ans:1, exp:'Certificarea 80+ Gold garantează o eficiență de 87-92% la diferite sarcini, reducând risipa de energie sub formă de căldură.' },
+  { q:'Ce scop are comanda DDU (Display Driver Uninstaller)?', opts:['Instalează drivere noi','Elimină complet driverele vechi GPU înainte de instalare nouă','Actualizează BIOS-ul','Formatează discul'] , ans:1, exp:'DDU (Display Driver Uninstaller) elimină toate urmele driverelor GPU existente, prevenind conflictele cu driverele noi.' },
+  { q:'Ce este RAM dual-channel?', opts:['O memorie cu două fețe fizice','Configurație cu 2 module RAM ce dublează lățimea de bandă','Un tip de RAM mai vechi','RAM pentru servere'] , ans:1, exp:'Dual-channel înseamnă instalarea a 2 module RAM identice în sloturile corecte, care funcționează simultan, dublând teoretic lățimea de bandă față de single-channel.' },
+  { q:'Care este ordinea corectă a etapelor de upgrade?', opts:['Cumpărare → Instalare → Backup → Testare','Diagnosticare → Planificare → Backup → Achiziție → Instalare → Testare','Backup → Cumpărare → Formatare → Instalare','Testare → Diagnosticare → Instalare'] , ans:1, exp:'Procesul corect: Diagnosticare → Planificare → Backup date → Achiziție → Instalare → Testare. Backup-ul ÎNAINTE de orice intervenție este esențial!' },
+  { q:'Ce socket folosesc procesoarele Intel Core gen 12-14?', opts:['AM4','AM5','LGA1700','TR4'] , ans:2, exp:'Procesoarele Intel Core gen 12, 13 și 14 (Alder Lake, Raptor Lake) folosesc socket-ul LGA1700, compatibil cu plăci de bază cu chipset seria 600/700.' },
+  { q:'Ce tehnologie permite SSD-ului să acceseze direct memoria RAM?', opts:['RAID 0','DirectStorage','Cache write-back','Optane Memory'] , ans:1, exp:'DirectStorage (Microsoft) permite jocurilor să acceseze datele direct de pe SSD la GPU, ocolind CPU-ul, reducând timpii de încărcare în jocuri.' },
+  { q:'De ce este important să actualizezi BIOS-ul?', opts:['Schimbă culoarea LED-urilor','Adaugă suport pentru noi procesoare și remediază vulnerabilități','Crește viteza internetului','Nu există niciun motiv'] , ans:1, exp:'Actualizările BIOS adaugă suport pentru procesoare noi (microcode), remediază vulnerabilități (Spectre, Meltdown) și îmbunătățesc compatibilitatea cu componentele noi.' },
+  { q:'Ce înseamnă ESD în contextul instalării hardware?', opts:['Enhanced Storage Drive','Electrostatic Discharge (descărcare electrostatică)','External SSD Device','Efficient System Design'] , ans:1, exp:'ESD (Electrostatic Discharge) este descărcarea electrostatică ce poate distruge componentele electronice. Se previne prin bratara antistatică sau atingerea unui obiect metalic împrumutat.' },
+];
+
+// ═══════════════════════════════════════════════
+// RENDER HW CARDS
+// ═══════════════════════════════════════════════
+function renderHW() {
+  const g = document.getElementById('hwGrid');
+  g.innerHTML = hwData.map(c => `
+    <div class="hw-card">
+      <span class="hw-icon">${c.icon}</span>
+      <h3>${c.name}</h3>
+      <p>${c.desc}</p>
+      <div>${c.tags.map(t=>`<span class="hw-tag">${t}</span>`).join('')}</div>
+      <div class="hw-impact">
+        <span class="impact-label">Impact</span>
+        <div class="impact-bar-wrap">
+          <div class="impact-bar" style="width:0%" data-w="${c.impact}%"></div>
+        </div>
+        <span class="impact-pct">${c.impact}%</span>
+      </div>
+    </div>
+  `).join('');
+
+  // Animate bars
+  setTimeout(() => {
+    document.querySelectorAll('.impact-bar').forEach(b => {
+      b.style.width = b.dataset.w;
+    });
+  }, 300);
+}
+
+// ═══════════════════════════════════════════════
+// RENDER SW TABS
+// ═══════════════════════════════════════════════
+function renderSW(activeId) {
+  const id = activeId || swData[0].id;
+  document.getElementById('swTabs').innerHTML = swData.map(s => `
+    <button class="tab ${s.id===id?'active':''}" onclick="renderSW('${s.id}')">${s.icon} ${s.label}</button>
+  `).join('');
+  const item = swData.find(s=>s.id===id);
+  document.getElementById('swContent').innerHTML = `
+    <div class="hw-card" style="max-width:100%;">
+      <span class="hw-icon">${item.icon}</span>
+      <h3>${item.title}</h3>
+      <p style="margin-bottom:1rem;">${item.desc}</p>
+      <div style="margin-bottom:1rem;">
+        ${item.details.map(d=>`<div style="display:flex;align-items:flex-start;gap:0.5rem;padding:0.35rem 0;border-bottom:1px solid var(--border);font-size:0.85rem;color:var(--muted);">
+          <span style="color:var(--cyan);flex-shrink:0;">▸</span> ${d}
+        </div>`).join('')}
+      </div>
+      <div style="background:rgba(255,215,64,0.07);border:1px solid rgba(255,215,64,0.2);border-radius:6px;padding:0.7rem 1rem;font-size:0.82rem;color:var(--yellow);">
+        💡 <strong>Sfat:</strong> ${item.tip}
+      </div>
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════
+// RENDER STEPS
+// ═══════════════════════════════════════════════
+function renderSteps() {
+  document.getElementById('stepsWrap').innerHTML = steps.map(s => `
+    <div class="step">
+      <div class="step-num">${s.num}</div>
+      <div class="step-body">
+        <h3>${s.title}</h3>
+        <p>${s.desc}</p>
+        <span class="step-tool">🛠 ${s.tool}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════
+// SIMULATOR
+// ═══════════════════════════════════════════════
+const simState = {};
+
+function renderSimulator() {
+  function itemHTML(items, prefix) {
+    return items.map(item => {
+      simState[item.id] = false;
+      return `<div class="sim-item">
+        <div>
+          <div class="sim-item-name">${item.name}</div>
+          <div class="sim-item-sub">${item.sub}${item.price>0?' · ~'+item.price+' RON':' · Gratuit'}</div>
+        </div>
+        <label class="sim-toggle">
+          <input type="checkbox" id="sim_${item.id}" onchange="simToggle('${item.id}',this.checked)">
+          <span class="sim-slider"></span>
+        </label>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('simHW').innerHTML = itemHTML(simHWItems,'hw');
+  document.getElementById('simSW').innerHTML = itemHTML(simSWItems,'sw');
+  updateSimResults();
+}
+
+function simToggle(id, val) {
+  simState[id] = val;
+  updateSimResults();
+}
+
+function updateSimResults() {
+  const allItems = [...simHWItems, ...simSWItems];
+  let bootBase=90, perfBase=30, scoreBase=20, cost=0;
+  let bootD=0, perfD=0, scoreD=0;
+  const active = [];
+
+  allItems.forEach(item => {
+    if(simState[item.id]) {
+      bootD  += item.bootDelta;
+      perfD  += item.perfDelta;
+      scoreD += item.scoreDelta;
+      cost   += item.price;
+      active.push(item);
+    }
+  });
+
+  const boot  = Math.max(8,  bootBase  + bootD);
+  const perf  = Math.min(99, perfBase  + perfD);
+  const score = Math.min(99, scoreBase + scoreD);
+
+  document.getElementById('simMetrics').innerHTML = `
+    <div class="sim-metric">
+      <span class="val">${boot}s</span>
+      <span class="lbl">Boot time</span>
+      <span class="delta ${bootD<0?'up':''}">
+        ${bootD<0?'▼ '+Math.abs(bootD)+'s mai rapid':'— neschimbat'}
+      </span>
+    </div>
+    <div class="sim-metric">
+      <span class="val">${perf}%</span>
+      <span class="lbl">Performanță</span>
+      <span class="delta up">+${perfD}% față de bază</span>
+    </div>
+    <div class="sim-metric">
+      <span class="val">${score}/99</span>
+      <span class="lbl">Scor sistem</span>
+      <span class="delta up">+${scoreD} puncte</span>
+    </div>
+    <div class="sim-metric">
+      <span class="val">${cost}</span>
+      <span class="lbl">Cost (RON)</span>
+      <span class="delta ${cost>0?'down':''}">
+        ${cost>0?'Investiție totală':'Selectează componente'}
+      </span>
+    </div>
+  `;
+
+  const rows = active.length
+    ? active.map(i=>`<div class="cost-row"><span class="name">${i.name}</span><span class="price">${i.price>0?'~'+i.price+' RON':'Gratuit'}</span></div>`).join('')
+    : `<div style="color:var(--muted);font-size:0.85rem;padding:0.4rem 0;">Nicio componentă selectată.</div>`;
+
+  document.getElementById('simCostBar').innerHTML = `
+    ${rows}
+    ${active.length ? `<div class="cost-total"><span class="name">TOTAL</span><span class="price">~${cost} RON</span></div>` : ''}
+  `;
+}
+
+// ═══════════════════════════════════════════════
+// QUIZ
+// ═══════════════════════════════════════════════
+let quizIdx = 0, quizScore = 0, quizAnswered = false;
+
+function renderQuiz() {
+  const prog = document.getElementById('quizProgress');
+  prog.innerHTML = quizData.map((_,i)=>`<div class="quiz-progress-seg ${i<quizIdx?'done':''}"></div>`).join('');
+
+  if(quizIdx >= quizData.length) {
+    const pct = Math.round(quizScore/quizData.length*100);
+    const msg = pct>=80?'Excelent! Ești expert în upgrade-uri! 🏆'
+                :pct>=60?'Bine! Mai ai câte ceva de învățat. 👍'
+                :'Continuă să studiezi! 📚';
+    document.getElementById('quizBody').innerHTML = `
+      <div class="quiz-result">
+        <span class="score">${quizScore}/${quizData.length}</span>
+        <p>${msg}</p>
+        <p style="color:var(--muted);margin-bottom:1.5rem;">Ai răspuns corect la ${pct}% din întrebări.</p>
+        <button class="btn btn-primary" onclick="resetQuiz()">🔄 Încearcă din nou</button>
+      </div>`;
+    return;
+  }
+
+  const q = quizData[quizIdx];
+  quizAnswered = false;
+  document.getElementById('quizBody').innerHTML = `
+    <div class="quiz-q">❓ ${q.q}</div>
+    <div class="quiz-options">
+      ${q.opts.map((o,i)=>`<button class="quiz-opt" onclick="answerQuiz(${i})">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}
+    </div>
+    <div class="quiz-feedback" id="qf"></div>
+    <div class="quiz-nav">
+      <span class="quiz-counter">Întrebarea ${quizIdx+1} din ${quizData.length} · Scor: ${quizScore}</span>
+      <button class="btn btn-outline" id="nextBtn" style="display:none" onclick="nextQuiz()">Următoarea →</button>
+    </div>`;
+}
+
+function answerQuiz(i) {
+  if(quizAnswered) return;
+  quizAnswered = true;
+  const q = quizData[quizIdx];
+  const opts = document.querySelectorAll('.quiz-opt');
+  const fb = document.getElementById('qf');
+  opts.forEach(o=>o.style.pointerEvents='none');
+  if(i===q.ans){
+    quizScore++;
+    opts[i].classList.add('correct');
+    fb.textContent = '✅ Corect! ' + q.exp;
+    fb.className = 'quiz-feedback ok';
+  } else {
+    opts[i].classList.add('wrong');
+    opts[q.ans].classList.add('correct');
+    fb.textContent = '❌ Greșit. ' + q.exp;
+    fb.className = 'quiz-feedback err';
+  }
+  document.getElementById('nextBtn').style.display='flex';
+}
+
+function nextQuiz() {
+  quizIdx++;
+  renderQuiz();
+}
+
+function resetQuiz() {
+  quizIdx=0; quizScore=0; quizAnswered=false;
+  renderQuiz();
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+renderHW();
+renderSW();
+renderSteps();
+renderSimulator();
+renderQuiz();
+
+// Intersection observer for impact bars
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting) {
+      e.target.querySelectorAll('.impact-bar').forEach(b=>b.style.width=b.dataset.w);
+    }
+  });
+}, {threshold:0.3});
+const hwSection = document.getElementById('hwGrid');
+if(hwSection) obs.observe(hwSection);
+</script>
+</body>
+</html>
